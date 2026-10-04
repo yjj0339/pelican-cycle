@@ -1,350 +1,706 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"="width=device-width, initial-scale=1.0">
-    <title>鹈鹕骑自行车</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-            background: linear-gradient(to bottom, #87CEEB 0%, #B0E3F5 100%);
-        }
-
-        .title {
-            position: absolute;
-            top: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 700;
-            color: #2C5F7F;
-            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.8);
-            z-index: 100;
-            letter-spacing: 0.1em;
-        }
-
-        .scene {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* 视差背景层 */
-        .parallax-layer {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-        }
-
-        /* 云朵层 - 最慢 */
-        .clouds {
-            animation: parallax-slow 60s linear infinite;
-        }
-
-        /* 远山/海面层 - 中速 */
-        .mountains {
-            animation: parallax-medium 30s linear infinite;
-        }
-
-        /* 地面/灌木层 - 最快 */
-        .ground {
-            animation: parallax-fast 15s linear infinite;
-        }
-
-        @keyframes parallax-slow {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @keyframes parallax-medium {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @keyframes parallax-fast {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* 鹈鹕和自行车容器 */
-        .pelican-bike {
-            position: absolute;
-            top: 50%;
-            left: 35%;
-            transform: translate(-50%, -50%);
-            z-index: 50;
-        }
-
-        /* 车轮旋转 */
-        .wheel {
-            animation: rotate-wheel 2s linear infinite;
-            transform-origin: center;
-        }
-
-        @keyframes rotate-wheel {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* 鹈鹕身体起伏 */
-        .pelican-body {
-            animation: body-bounce 2s ease-in-out infinite;
-        }
-
-        @keyframes body-bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        /* 左腿蹬踏 - 大腿 */
-        .left-thigh {
-            animation: left-thigh-pedal 2s ease-in-out infinite;
-            transform-origin: 300px 280px; /* 髋关节位置 */
-        }
-
-        @keyframes left-thigh-pedal {
-            0%, 100% { transform: rotate(45deg); }
-            50% { transform: rotate(-15deg); }
-        }
-
-        /* 左腿 - 小腿 */
-        .left-calf {
-            animation: left-calf-pedal 2s ease-in-out infinite;
-            transform-origin: 285px 320px; /* 膝关节位置 */
-        }
-
-        @keyframes left-calf-pedal {
-            0%, 100% { transform: rotate(-45deg); }
-            50% { transform: rotate(15deg); }
-        }
-
-        /* 右腿蹬踏 - 大腿（相位相反） */
-        .right-thigh {
-            animation: right-thigh-pedal 2s ease-in-out infinite;
-            transform-origin: 300px 280px;
-        }
-
-        @keyframes right-thigh-pedal {
-            0%, 100% { transform: rotate(-15deg); }
-            50% { transform: rotate(45deg); }
-        }
-
-        /* 右腿 - 小腿 */
-        .right-calf {
-            animation: right-calf-pedal 2s ease-in-out infinite;
-            transform-origin: 315px 320px;
-        }
-
-        @keyframes right-calf-pedal {
-            0%, 100% { transform: rotate(15deg); }
-            50% { transform: rotate(-45deg); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鹈鹕的快乐骑行</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #87CEEB 0%, #B0E0E6 50%, #D4E8D4 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+    }
+    h1 {
+      position: absolute;
+      top: 30px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      color: #FF6B35;
+      text-shadow: 2px 2px 0 rgba(255,255,255,0.8), 4px 4px 12px rgba(0,0,0,0.25);
+      letter-spacing: 0.12em;
+      z-index: 10;
+      font-weight: 700;
+    }
+    canvas {
+      display: block;
+      background: transparent;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      border-radius: 12px;
+    }
+    .info {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      color: #555;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    }
+  </style>
 </head>
 <body>
-    <h1 class="title">🚴 鹈鹕的快乐骑行 🌊</h1>
-    
-    <div class="scene">
-        <!-- 背景层1：云朵 -->
-        <svg class="parallax-layer clouds" viewBox="0 0 2400 800" preserveAspectRatio="xMidYMid slice">
-            <!-- 重复两次以实现无缝循环 -->
-            <g>
-                <ellipse cx="200" cy="100" rx="80" ry="50" fill="#FFFFFF" opacity="0.7"/>
-                <ellipse cx="180" cy="110" rx="60" ry="40" fill="#FFFFFF" opacity="0.7"/>
-                <ellipse cx="220" cy="115" rx="70" ry="45" fill="#FFFFFF" opacity="0.7"/>
-                
-                <ellipse cx="600" cy="150" rx="90" ry="55" fill="#FFFFFF" opacity="0.6"/>
-                <ellipse cx="580" cy="165" rx="70" ry="45" fill="#FFFFFF" opacity="0.6"/>
-                
-                <ellipse cx="1000" cy="120" rx="75" ry="48" fill="#FFFFFF" opacity="0.65"/>
-                <ellipse cx="980" cy="135" rx="65" ry="42" fill="#FFFFFF" opacity="0.65"/>
-            </g>
-            <g transform="translate(1200, 0)">
-                <ellipse cx="200" cy="100" rx="80" ry="50" fill="#FFFFFF" opacity="0.7"/>
-                <ellipse cx="180" cy="110" rx="60" ry="40" fill="#FFFFFF" opacity="0.7"/>
-                <ellipse cx="220" cy="115" rx="70" ry="45" fill="#FFFFFF" opacity="0.7"/>
-                
-                <ellipse cx="600" cy="150" rx="90" ry="55" fill="#FFFFFF" opacity="0.6"/>
-                <ellipse cx="580" cy="165" rx="70" ry="45" fill="#FFFFFF" opacity="0.6"/>
-                
-                <ellipse cx="1000" cy="120" rx="75" ry="48" fill="#FFFFFF" opacity="0.65"/>
-                <ellipse cx="980" cy="135" rx="65" ry="42" fill="#FFFFFF" opacity="0.65"/>
-            </g>
-        </svg>
+  <h1>鹈鹕的快乐骑行</h1>
+  <canvas id="canvas"></canvas>
+  <div class="info">双骨 IK 驱动 · 车轮精确滚动 · 视差背景</div>
 
-        <!-- 背景层2：远山 -->
-        <svg class="parallax-layer mountains" viewBox="0 0 2400 800" preserveAspectRatio="xMidYMid slice">
-            <g>
-                <path d="M0 500 L150 350 L300 420 L450 300 L600 400 L750 320 L900 450 L1200 500 L1200 800 L0 800 Z" 
-                      fill="#A8D5BA" opacity="0.5"/>
-                <path d="M200 520 L400 380 L600 460 L800 360 L1000 480 L1200 420 L1200 800 L0 800 Z" 
-                      fill="#8BC9A3" opacity="0.4"/>
-            </g>
-            <g transform="translate(1200, 0)">
-                <path d="M0 500 L150 350 L300 420 L450 300 L600 400 L750 320 L900 450 L1200 500 L1200 800 L0 800 Z" 
-                      fill="#A8D5BA" opacity="0.5"/>
-                <path d="M200 520 L400 380 L600 460 L800 360 L1000 480 L1200 420 L1200 800 L0 800 Z" 
-                      fill="#8BC9A3" opacity="0.4"/>
-            </g>
-        </svg>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-        <!-- 背景层3：地面和灌木 -->
-        <svg class="parallax-layer ground" viewBox="0 0 2400 800" preserveAspectRatio="xMidYMid slice">
-            <rect x="0" y="600" width="2400" height="200" fill="#90C695"/>
-            <g>
-                <!-- 灌木1 -->
-                <circle cx="100" cy="620" r="25" fill="#6B9F7A"/>
-                <circle cx="85" cy="625" r="20" fill="#6B9F7A"/>
-                <circle cx="115" cy="625" r="20" fill="#6B9F7A"/>
-                
-                <!-- 灌木2 -->
-                <circle cx="400" cy="615" r="30" fill="#5A8A68"/>
-                <circle cx="380" cy="625" r="25" fill="#5A8A68"/>
-                <circle cx="420" cy="625" r="25" fill="#5A8A68"/>
-                
-                <!-- 灌木3 -->
-                <circle cx="700" cy="622" r="22" fill="#6B9F7A"/>
-                <circle cx="685" cy="628" r="18" fill="#6B9F7A"/>
-                
-                <!-- 路面分隔线 -->
-                <rect x="0" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="180" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="360" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="540" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="720" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="900" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="1080" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-            </g>
-            <g transform="translate(1200, 0)">
-                <circle cx="100" cy="620" r="25" fill="#6B9F7A"/>
-                <circle cx="85" cy="625" r="20" fill="#6B9F7A"/>
-                <circle cx="115" cy="625" r="20" fill="#6B9F7A"/>
-                
-                <circle cx="400" cy="615" r="30" fill="#5A8A68"/>
-                <circle cx="380" cy="625" r="25" fill="#5A8A68"/>
-                <circle cx="420" cy="625" r="25" fill="#5A8A68"/>
-                
-                <circle cx="700" cy="622" r="22" fill="#6B9F7A"/>
-                <circle cx="685" cy="628" r="18" fill="#6B9F7A"/>
-                
-                <rect x="0" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="180" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="360" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="540" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="720" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="900" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-                <rect x="1080" y="650" width="120" height="4" fill="#FFFFFF" opacity="0.6"/>
-            </g>
-        </svg>
+    canvas.width = 1200;
+    canvas.height = 600;
 
-        <!-- 鹈鹕骑自行车 -->
-        <div class="pelican-bike">
-            <svg width="600" height="500" viewBox="0 0 600 500">
-                <!-- 自行车 -->
-                <g id="bicycle">
-                    <!-- 车架 -->
-                    <line x1="250" y1="350" x2="350" y2="350" stroke="#E63946" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="250" y1="350" x2="280" y2="280" stroke="#E63946" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="350" y1="350" x2="320" y2="280" stroke="#E63946" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="280" y1="280" x2="320" y2="280" stroke="#E63946" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="300" y1="280" x2="300" y2="240" stroke="#E63946" stroke-width="5" stroke-linecap="round"/>
-                    
-                    <!-- 车把 -->
-                    <line x1="300" y1="240" x2="285" y2="225" stroke="#E63946" stroke-width="4" stroke-linecap="round"/>
-                    <line x1="285" y1="225" x2="270" y2="225" stroke="#2C3E50" stroke-width="6" stroke-linecap="round"/>
-                    
-                    <!-- 座位 -->
-                    <ellipse cx="300" cy="275" rx="25" ry="10" fill="#2C3E50"/>
-                    
-                    <!-- 前轮 -->
-                    <g class="wheel">
-                        <circle cx="250" cy="350" r="45" fill="none" stroke="#2C3E50" stroke-width="5"/>
-                        <line x1="250" y1="305" x2="250" y2="395" stroke="#2C3E50" stroke-width="2"/>
-                        <line x1="205" y1="350" x2="295" y2="350" stroke="#2C3E50" stroke-width="2"/>
-                        <line x1="218" y1="318" x2="282" y2="382" stroke="#2C3E50" stroke-width="2"/>
-                        <line x1="218" y1="382" x2="282" y2="318" stroke="#2C3E50" stroke-width="2"/>
-                        <circle cx="250" cy="350" r="8" fill="#E63946"/>
-                    </g>
-                    
-                    <!-- 后轮 -->
-                    <g class="wheel">
-                        <circle cx="350" cy="350" r="45" fill="none" stroke="#2C3E50" stroke-width="5"/>
-                        <line x1="350" y1="305" x2="350" y2="395" stroke="#2C3E50" stroke-width="2"/>
-                        <line x1="305" y1="350" x2="395" y2="350" stroke="#2C3E50" stroke-width="2"/>
-                        <line x1="318" y1="318" x2="382" y2="382" stroke="#2C3E50" stroke-width="2"/>
-                        <line x1="318" y1="382" x2="382" y2="318" stroke="#2C3E50" stroke-width="2"/>
-                        <circle cx="350" cy="350" r="8" fill="#E63946"/>
-                    </g>
-                    
-                    <!-- 脚踏板 -->
-                    <circle cx="300" cy="320" r="15" fill="none" stroke="#2C3E50" stroke-width="3"/>
-                </g>
+    // ========== 全局状态 ==========
+    let time = 0;
+    let crankAngle = 0;
+    let wheelAngle = 0;
+    let bgOffset1 = 0; // 云层
+    let bgOffset2 = 0; // 海面/远山
+    let bgOffset3 = 0; // 路面灌木
 
-                <!-- 鹈鹕 -->
-                <g class="pelican-body">
-                    <!-- 身体 -->
-                    <ellipse cx="300" cy="220" rx="55" ry="70" fill="#F5F5F5" stroke="#D0D0D0" stroke-width="2"/>
-                    
-                    <!-- 翅膀 -->
-                    <ellipse cx="260" cy="230" rx="35" ry="50" fill="#E8E8E8" stroke="#D0D0D0" stroke-width="2" transform="rotate(-20 260 230)"/>
-                    
-                    <!-- 头部 -->
-                    <circle cx="300" cy="170" r="35" fill="#F5F5F5" stroke="#D0D0D0" stroke-width="2"/>
-                    
-                    <!-- 眼睛 -->
-                    <circle cx="310" cy="165" r="6" fill="#2C3E50"/>
-                    <circle cx="313" cy="163" r="2" fill="#FFFFFF"/>
-                    
-                    <!-- 大喙 -->
-                    <path d="M 320 175 Q 380 175 390 185 Q 385 195 320 195 Z" 
-                          fill="#FFA500" stroke="#FF8C00" stroke-width="2"/>
-                    
-                    <!-- 喉囊 -->
-                    <path d="M 320 195 Q 340 220 320 235 Q 315 220 320 195 Z" 
-                          fill="#FFD700" stroke="#FFA500" stroke-width="2" opacity="0.85"/>
-                    
-                    <!-- 尾巴 -->
-                    <path d="M 245 240 Q 220 250 210 270 Q 225 260 245 255 Z" 
-                          fill="#E8E8E8" stroke="#D0D0D0" stroke-width="2"/>
-                </g>
+    // ========== 几何参数 ==========
+    const bikeX = 350;
+    const groundY = 450;
+    const wheelRadius = 42;
+    const crankRadius = 58;
+    const speed = 3.2;
 
-                <!-- 左腿（大腿） -->
-                <g class="left-thigh">
-                    <line x1="300" y1="280" x2="285" y2="320" stroke="#FFA500" stroke-width="8" stroke-linecap="round"/>
-                </g>
-                
-                <!-- 左腿（小腿） -->
-                <g class="left-calf">
-                    <line x1="285" y1="320" x2="285" y2="355" stroke="#FFA500" stroke-width="7" stroke-linecap="round"/>
-                    <!-- 左脚 -->
-                    <ellipse cx="285" cy="360" rx="12" ry="8" fill="#FF8C00"/>
-                </g>
+    // 车架关键点
+    const rearWheelX = bikeX;
+    const rearWheelY = groundY - wheelRadius;
+    const frontWheelX = bikeX + 180;
+    const frontWheelY = groundY - wheelRadius;
 
-                <!-- 右腿（大腿） -->
-                <g class="right-thigh">
-                    <line x1="300" y1="280" x2="315" y2="320" stroke="#FFA500" stroke-width="8" stroke-linecap="round"/>
-                </g>
-                
-                <!-- 右腿（小腿） -->
-                <g class="right-calf">
-                    <line x1="315" y1="320" x2="315" y2="355" stroke="#FFA500" stroke-width="7" stroke-linecap="round"/>
-                    <!-- 右脚 -->
-                    <ellipse cx="315" cy="360" rx="12" ry="8" fill="#FF8C00"/>
-                </g>
-            </svg>
-        </div>
-    </div>
+    const crankAxisX = bikeX + 20;
+    const crankAxisY = rearWheelY - 15;
+
+    const seatX = bikeX + 10;
+    const seatY = crankAxisY - 85;
+
+    const handlebarX = frontWheelX - 10;
+    const handlebarY = frontWheelY - 100;
+
+    // 鹈鹕髋部固定在坐垫上
+    const hipX = seatX;
+    const hipY = seatY;
+
+    // 腿部长度
+    const thighLen = 72;
+    const calfLen = 68;
+
+    // ========== 辅助：两骨 IK 求解 ==========
+    function solveIK(hipX, hipY, pedalX, pedalY, thighLen, calfLen) {
+      const dx = pedalX - hipX;
+      const dy = pedalY - hipY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      const maxReach = thighLen + calfLen;
+      const minReach = Math.abs(thighLen - calfLen);
+      const clampedDistance = Math.max(minReach + 1, Math.min(maxReach - 1, distance));
+
+      const cosKnee = (thighLen * thighLen + calfLen * calfLen - clampedDistance * clampedDistance) / (2 * thighLen * calfLen);
+      const kneeAngle = Math.acos(Math.max(-1, Math.min(1, cosKnee)));
+
+      const hipToPedalAngle = Math.atan2(dy, dx);
+      const cosThighAngle = (thighLen * thighLen + clampedDistance * clampedDistance - calfLen * calfLen) / (2 * thighLen * clampedDistance);
+      const thighAngleOffset = Math.acos(Math.max(-1, Math.min(1, cosThighAngle)));
+
+      const thighAngle = hipToPedalAngle + thighAngleOffset;
+
+      const kneeX = hipX + thighLen * Math.cos(thighAngle);
+      const kneeY = hipY + thighLen * Math.sin(thighAngle);
+
+      return { kneeX, kneeY, pedalX, pedalY };
+    }
+
+    // ========== 绘制多层背景（视差） ==========
+    function drawBackground() {
+      // 第一层：云朵（速度 0.25x）
+      ctx.save();
+      const cloudSpeed = speed * 0.25;
+      const cloudX1 = (bgOffset1 * cloudSpeed) % 300;
+      const cloudX2 = (bgOffset1 * cloudSpeed + 300) % 600;
+      const cloudX3 = (bgOffset1 * cloudSpeed + 500) % 800;
+
+      drawCloud(100 + cloudX1, 80, 60, '#FFF');
+      drawCloud(400 + cloudX2, 120, 50, '#FFF');
+      drawCloud(700 + cloudX3, 90, 55, '#FFF');
+      drawCloud(1000 + cloudX1, 110, 50, '#FFF');
+      ctx.restore();
+
+      // 第二层：圆滑丘陵（速度 0.5x）
+      ctx.save();
+      const mountainSpeed = speed * 0.5;
+      const mountainX = (bgOffset2 * mountainSpeed) % canvas.width;
+
+      // 远山层（深绿）
+      ctx.fillStyle = '#6B9B6E';
+      ctx.beginPath();
+      ctx.moveTo(-200 + mountainX, 300);
+      for (let x = -200; x < canvas.width + 200; x += 80) {
+        const adjX = x + mountainX;
+        const y = 250 + Math.sin((x + bgOffset2) * 0.008) * 50 + Math.cos(x * 0.015) * 30;
+        ctx.lineTo(adjX, y);
+      }
+      ctx.lineTo(canvas.width + 200, 350);
+      ctx.lineTo(-200, 350);
+      ctx.closePath();
+      ctx.fill();
+
+      // 近山层（浅绿）
+      ctx.fillStyle = '#8BC48A';
+      ctx.beginPath();
+      ctx.moveTo(-200 + mountainX * 0.7, 350);
+      for (let x = -200; x < canvas.width + 200; x += 60) {
+        const adjX = x + mountainX * 0.7;
+        const y = 300 + Math.sin((x + bgOffset2 * 0.7) * 0.012) * 40 + Math.cos(x * 0.02) * 25;
+        ctx.lineTo(adjX, y);
+      }
+      ctx.lineTo(canvas.width + 200, 380);
+      ctx.lineTo(-200, 380);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 草地与路面过渡
+      // 草地
+      ctx.fillStyle = '#A8D5A8';
+      ctx.fillRect(0, 380, canvas.width, 50);
+
+      // 草沿（路边）
+      ctx.fillStyle = '#7FB77F';
+      ctx.fillRect(0, groundY - 15, canvas.width, 15);
+
+      // 柏油路面（浅色主题：浅灰路面）
+      ctx.fillStyle = '#d3d9df';
+      ctx.fillRect(0, groundY, canvas.width, 150);
+
+      // 白色虚线中线
+      ctx.save();
+      ctx.strokeStyle = "#FFFFFF";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([20, 15]);
+      ctx.lineDashOffset = -(bgOffset3 * speed) % 35;
+      ctx.beginPath();
+      ctx.moveTo(0, groundY + 75);
+      ctx.lineTo(canvas.width, groundY + 75);
+      ctx.stroke();
+      ctx.restore();
+
+      // 第三层：路面灌木和花丛（速度 1.0x）
+      ctx.save();
+      const bushX = (bgOffset3 * speed) % 150;
+      for (let i = 0; i < 10; i++) {
+        const x = i * 150 + bushX;
+        drawBush(x, groundY - 15, 30 + Math.sin(i) * 10, '#66BB6A');
+      }
+
+      // 花朵点缀
+      const flowerX = (bgOffset3 * speed * 1.1) % 100;
+      for (let i = 0; i < 15; i++) {
+        const x = i * 100 + flowerX;
+        drawFlower(x, groundY - 20, 8, ['#FF6B9D', '#FFC837', '#C44569'][i % 3]);
+      }
+      ctx.restore();
+    }
+
+    function drawCloud(x, y, size, color) {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+      ctx.arc(x, y, size * 0.6, 0, Math.PI * 2);
+      ctx.arc(x + size * 0.5, y, size * 0.5, 0, Math.PI * 2);
+      ctx.arc(x + size, y, size * 0.6, 0, Math.PI * 2);
+      ctx.arc(x + size * 0.5, y - size * 0.3, size * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    function drawBush(x, y, size, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y - size * 0.3, size * 0.6, 0, Math.PI * 2);
+      ctx.arc(x + size * 0.5, y - size * 0.5, size * 0.5, 0, Math.PI * 2);
+      ctx.arc(x + size, y - size * 0.4, size * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawFlower(x, y, size, color) {
+      ctx.fillStyle = color;
+      for (let i = 0; i < 5; i++) {
+        const angle = (i / 5) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(angle) * size * 0.6, y + Math.sin(angle) * size * 0.6, size * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#FFF59D';
+      ctx.beginPath();
+      ctx.arc(x, y, size * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ========== 绘制自行车 ==========
+    function drawBike() {
+      ctx.save();
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // 后轮
+      drawWheel(rearWheelX, rearWheelY, wheelRadius, wheelAngle);
+
+      // 前轮
+      drawWheel(frontWheelX, frontWheelY, wheelRadius, wheelAngle);
+
+      // 车架（从后轮到前轮的三角形结构）
+      ctx.strokeStyle = '#E53935';
+      ctx.fillStyle = '#E53935';
+
+      // 后下叉
+      ctx.beginPath();
+      ctx.moveTo(rearWheelX, rearWheelY);
+      ctx.lineTo(crankAxisX, crankAxisY);
+      ctx.stroke();
+
+      // 后上管
+      ctx.beginPath();
+      ctx.moveTo(rearWheelX, rearWheelY);
+      ctx.lineTo(seatX, seatY);
+      ctx.stroke();
+
+      // 上管（从坐垫到车把）
+      ctx.beginPath();
+      ctx.moveTo(seatX, seatY);
+      ctx.lineTo(handlebarX, handlebarY);
+      ctx.stroke();
+
+      // 下管（从曲柄轴到车把下方）
+      ctx.beginPath();
+      ctx.moveTo(crankAxisX, crankAxisY);
+      ctx.lineTo(handlebarX, handlebarY + 20);
+      ctx.stroke();
+
+      // 前叉（从车把到前轮）
+      ctx.beginPath();
+      ctx.moveTo(handlebarX, handlebarY);
+      ctx.lineTo(frontWheelX, frontWheelY);
+      ctx.stroke();
+
+      // 坐垫
+      ctx.fillStyle = '#424242';
+      ctx.beginPath();
+      ctx.ellipse(seatX, seatY, 25, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 车把
+      ctx.strokeStyle = '#424242';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(handlebarX - 15, handlebarY - 5);
+      ctx.lineTo(handlebarX, handlebarY);
+      ctx.lineTo(handlebarX + 15, handlebarY - 5);
+      ctx.stroke();
+
+      // 曲柄和踏板
+      ctx.strokeStyle = '#616161';
+      ctx.lineWidth = 4;
+
+      // 左曲柄和踏板
+      const leftPedalX = crankAxisX + crankRadius * Math.cos(crankAngle);
+      const leftPedalY = crankAxisY + crankRadius * Math.sin(crankAngle);
+      ctx.beginPath();
+      ctx.moveTo(crankAxisX, crankAxisY);
+      ctx.lineTo(leftPedalX, leftPedalY);
+      ctx.stroke();
+      drawPedal(leftPedalX, leftPedalY);
+
+      // 右曲柄和踏板（相位差 180°）
+      const rightPedalX = crankAxisX + crankRadius * Math.cos(crankAngle + Math.PI);
+      const rightPedalY = crankAxisY + crankRadius * Math.sin(crankAngle + Math.PI);
+      ctx.beginPath();
+      ctx.moveTo(crankAxisX, crankAxisY);
+      ctx.lineTo(rightPedalX, rightPedalY);
+      ctx.stroke();
+      drawPedal(rightPedalX, rightPedalY);
+
+      ctx.restore();
+
+      return { leftPedalX, leftPedalY, rightPedalX, rightPedalY };
+    }
+
+    function drawWheel(x, y, r, angle) {
+      ctx.save();
+      ctx.strokeStyle = '#212121';
+      ctx.lineWidth = 4;
+
+      // 轮圈
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 轮轴
+      ctx.fillStyle = '#616161';
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 辐条（8 根，随轮子旋转）
+      ctx.strokeStyle = '#757575';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 8; i++) {
+        const spokeAngle = angle + (i / 8) * Math.PI * 2;
+        const spokeX = x + r * 0.9 * Math.cos(spokeAngle);
+        const spokeY = y + r * 0.9 * Math.sin(spokeAngle);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(spokeX, spokeY);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawPedal(x, y) {
+      ctx.fillStyle = '#757575';
+      ctx.fillRect(x - 10, y - 5, 20, 10);
+      ctx.strokeStyle = '#424242';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 10, y - 5, 20, 10);
+    }
+
+    // ========== 绘制鹈鹕（用 IK 驱动双腿） ==========
+    function drawPelican(pedals, bodyBounce) {
+      ctx.save();
+
+      // 身体起伏
+      const avgPedalY = (pedals.leftPedalY + pedals.rightPedalY) / 2;
+      const bounce = (avgPedalY - crankAxisY) * 0.08;
+      const adjustedHipY = hipY + bounce;
+
+      // 头部惯性
+      const headBounce = bounce * 0.6 + Math.sin(time * 0.05) * 1.5;
+
+      // 计算双腿 IK
+      const leftLeg = solveIK(hipX, adjustedHipY, pedals.leftPedalX, pedals.leftPedalY, thighLen, calfLen);
+      const rightLeg = solveIK(hipX, adjustedHipY, pedals.rightPedalX, pedals.rightPedalY, thighLen, calfLen);
+
+      // 判断哪条腿在后（更深色，先画）
+      const leftIsBack = pedals.leftPedalY < pedals.rightPedalY;
+
+      // 绘制远腿（在后，深色）
+      ctx.strokeStyle = '#E68A00';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+
+      if (leftIsBack) {
+        ctx.beginPath();
+        ctx.moveTo(hipX, adjustedHipY);
+        ctx.lineTo(leftLeg.kneeX, leftLeg.kneeY);
+        ctx.lineTo(leftLeg.pedalX, leftLeg.pedalY);
+        ctx.stroke();
+        drawFoot(leftLeg.pedalX, leftLeg.pedalY);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(hipX, adjustedHipY);
+        ctx.lineTo(rightLeg.kneeX, rightLeg.kneeY);
+        ctx.lineTo(rightLeg.pedalX, rightLeg.pedalY);
+        ctx.stroke();
+        drawFoot(rightLeg.pedalX, rightLeg.pedalY);
+      }
+
+      // 身体（白色，圆润）
+      ctx.fillStyle = '#FEFEFE';
+      ctx.strokeStyle = '#D0D0D0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(hipX, adjustedHipY - 20, 38, 48, 0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // 尾羽
+      ctx.fillStyle = '#F5F5F5';
+      ctx.strokeStyle = '#C0C0C0';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(hipX - 35, adjustedHipY + 10);
+      ctx.quadraticCurveTo(hipX - 60, adjustedHipY + 5, hipX - 70, adjustedHipY + 20);
+      ctx.quadraticCurveTo(hipX - 60, adjustedHipY + 15, hipX - 35, adjustedHipY + 18);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // 颈部（自然弯曲）
+      const neckX = hipX + 25;
+      const neckY = adjustedHipY - 50;
+      const neckMidX = hipX + 18;
+      const neckMidY = adjustedHipY - 42;
+
+      ctx.strokeStyle = '#FEFEFE';
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.moveTo(hipX + 10, adjustedHipY - 35);
+      ctx.quadraticCurveTo(neckMidX, neckMidY, neckX, neckY + headBounce);
+      ctx.stroke();
+
+      // 头部
+      const headX = neckX + 35;
+      const headY = neckY + headBounce - 8;
+      ctx.fillStyle = '#FEFEFE';
+      ctx.beginPath();
+      ctx.ellipse(headX - 5, headY, 24, 20, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#D0D0D0';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 长大喙（橙色）
+      ctx.fillStyle = '#FF8C00';
+      ctx.strokeStyle = '#E07B00';
+      ctx.lineWidth = 2;
+
+      // 上喙
+      ctx.beginPath();
+      ctx.moveTo(headX + 18, headY - 2);
+      ctx.lineTo(headX + 75, headY - 6);
+      ctx.lineTo(headX + 75, headY + 2);
+      ctx.lineTo(headX + 18, headY + 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // 下喙
+      ctx.beginPath();
+      ctx.moveTo(headX + 18, headY + 2);
+      ctx.lineTo(headX + 73, headY + 2);
+      ctx.lineTo(headX + 73, headY + 8);
+      ctx.lineTo(headX + 18, headY + 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // 喉囊（黄色，下垂）
+      const gradient = ctx.createLinearGradient(headX + 18, headY + 6, headX + 50, headY + 28);
+      gradient.addColorStop(0, '#FFD700');
+      gradient.addColorStop(1, '#FFA500');
+      ctx.fillStyle = gradient;
+      ctx.strokeStyle = '#E69500';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(headX + 18, headY + 6);
+      ctx.quadraticCurveTo(headX + 35, headY + 28, headX + 50, headY + 22);
+      ctx.quadraticCurveTo(headX + 60, headY + 10, headX + 73, headY + 8);
+      ctx.lineTo(headX + 73, headY + 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // 眼睛
+      ctx.fillStyle = '#212121';
+      ctx.beginPath();
+      ctx.arc(headX + 8, headY - 6, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 眼睛高光
+      ctx.fillStyle = '#FFF';
+      ctx.beginPath();
+      ctx.arc(headX + 10, headY - 7, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 右翅膀（后方，略深）
+      ctx.strokeStyle = '#A0A0A0';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(hipX - 15, adjustedHipY - 25);
+      ctx.quadraticCurveTo(hipX - 65, adjustedHipY - 15, hipX - 55, adjustedHipY + 15);
+      ctx.stroke();
+
+      // 左翅膀（搭在车把，有弧度）
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(hipX - 10, adjustedHipY - 30);
+      ctx.quadraticCurveTo(hipX + 40, handlebarY + 30, handlebarX - 5, handlebarY + 5);
+      ctx.stroke();
+
+      // 绘制近腿（在前，浅色）
+      ctx.strokeStyle = '#FFA500';
+      ctx.lineWidth = 6;
+
+      if (!leftIsBack) {
+        ctx.beginPath();
+        ctx.moveTo(hipX, adjustedHipY);
+        ctx.lineTo(leftLeg.kneeX, leftLeg.kneeY);
+        ctx.lineTo(leftLeg.pedalX, leftLeg.pedalY);
+        ctx.stroke();
+        drawFoot(leftLeg.pedalX, leftLeg.pedalY);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(hipX, adjustedHipY);
+        ctx.lineTo(rightLeg.kneeX, rightLeg.kneeY);
+        ctx.lineTo(rightLeg.pedalX, rightLeg.pedalY);
+        ctx.stroke();
+        drawFoot(rightLeg.pedalX, rightLeg.pedalY);
+      }
+
+      // 围巾（飘动）
+      drawScarf(neckX, neckY + headBounce);
+
+      ctx.restore();
+    }
+
+    function drawFoot(x, y) {
+      ctx.fillStyle = '#FF8C00';
+      ctx.beginPath();
+      ctx.ellipse(x, y, 9, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 脚趾
+      ctx.strokeStyle = '#E07B00';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(x + (i - 1) * 5, y);
+        ctx.lineTo(x + (i - 1) * 5, y + 8);
+        ctx.stroke();
+      }
+    }
+
+    function drawScarf(x, y) {
+      ctx.strokeStyle = '#FF5722';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+
+      const wave1 = Math.sin(time * 0.08) * 15;
+      const wave2 = Math.cos(time * 0.1) * 20;
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x - 30 + wave1, y + 10, x - 50 + wave2, y + 30);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x, y + 5);
+      ctx.quadraticCurveTo(x - 35 + wave2, y + 15, x - 60 + wave1, y + 40);
+      ctx.stroke();
+    }
+
+    // ========== 趣味细节 ==========
+    function drawExtraDetails() {
+      // 海鸥（两只，飞行）
+      drawSeagull(900 + Math.sin(time * 0.03) * 50, 150 + Math.cos(time * 0.02) * 20, time * 0.1);
+      drawSeagull(1100 + Math.sin(time * 0.025) * 60, 180 + Math.cos(time * 0.03) * 25, time * 0.12);
+
+      // 扬尘（小而淡的圆点）
+      drawDust(rearWheelX - 40, groundY - 10);
+      drawDust(frontWheelX - 35, groundY - 8);
+
+      // 速度线
+      drawSpeedLines();
+    }
+
+    function drawSeagull(x, y, wingAngle) {
+      ctx.save();
+      ctx.strokeStyle = '#78909C';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFF';
+      ctx.fill();
+      ctx.stroke();
+
+      const wingFlap = Math.sin(wingAngle) * 25;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - 20, y - 15 + wingFlap);
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 20, y - 15 + wingFlap);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawDust(x, y) {
+      ctx.save();
+
+      for (let i = 0; i < 4; i++) {
+        const dustX = x - i * 8 - (time * 2) % 40;
+        const dustY = y + Math.sin(time * 0.1 + i) * 3;
+        const dustSize = 3 + i * 1;
+        const alpha = 0.3 - i * 0.06;
+
+        ctx.fillStyle = `rgba(180, 180, 180, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(dustX, dustY, dustSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function drawSpeedLines() {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+
+      for (let i = 0; i < 8; i++) {
+        const lineX = canvas.width - (time * 5 + i * 80) % canvas.width;
+        const lineY = 200 + i * 40;
+
+        ctx.beginPath();
+        ctx.moveTo(lineX, lineY);
+        ctx.lineTo(lineX - 40, lineY);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // ========== 主动画循环 ==========
+    function animate() {
+      time++;
+
+      crankAngle += 0.055;
+
+      const angularSpeed = speed / wheelRadius;
+      wheelAngle += angularSpeed;
+
+      bgOffset1 += 1;
+      bgOffset2 += 1;
+      bgOffset3 += 1;
+
+      const leftPedalX = crankAxisX + crankRadius * Math.cos(crankAngle);
+      const leftPedalY = crankAxisY + crankRadius * Math.sin(crankAngle);
+
+      const rightPedalX = crankAxisX + crankRadius * Math.cos(crankAngle + Math.PI);
+      const rightPedalY = crankAxisY + crankRadius * Math.sin(crankAngle + Math.PI);
+
+      const pedals = { leftPedalX, leftPedalY, rightPedalX, rightPedalY };
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawBackground();
+      drawBike();
+
+      const bodyBounce = (leftPedalY + rightPedalY) / 2 - crankAxisY;
+      drawPelican(pedals, bodyBounce);
+
+      drawExtraDetails();
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
 </body>
 </html>
